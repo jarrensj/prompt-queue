@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface TodoItem {
   id: string;
@@ -15,6 +15,7 @@ export default function Home() {
   const [mounted, setMounted] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [newlyAddedId, setNewlyAddedId] = useState<string | null>(null);
+  const intervalsRef = useRef<Record<string, NodeJS.Timeout>>({});
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -76,6 +77,7 @@ export default function Home() {
       count--;
       if (count === 0) {
         clearInterval(interval);
+        delete intervalsRef.current[id];
         setTodos(prev => prev.filter(todo => todo.id !== id));
       } else {
         setTodos(prev => prev.map(todo => 
@@ -83,6 +85,22 @@ export default function Home() {
         ));
       }
     }, 1000);
+    
+    // Store interval reference so we can cancel it
+    intervalsRef.current[id] = interval;
+  };
+
+  const cancelDelete = (id: string) => {
+    // Clear the interval
+    if (intervalsRef.current[id]) {
+      clearInterval(intervalsRef.current[id]);
+      delete intervalsRef.current[id];
+    }
+    
+    // Reset the todo back to normal state
+    setTodos(prev => prev.map(todo => 
+      todo.id === id ? { ...todo, isCompleting: false, countdown: undefined } : todo
+    ));
   };
 
   if (!mounted) {
@@ -147,9 +165,15 @@ export default function Home() {
                   
                   {todo.isCompleting ? (
                     <div className="flex items-center gap-2">
-                      <span className="text-red-600 dark:text-red-400 font-bold text-base animate-pulse">
+                      <span className="text-red-600 dark:text-red-400 font-semibold text-base animate-pulse">
                         Deleting in {todo.countdown}…
                       </span>
+                      <button
+                        onClick={() => cancelDelete(todo.id)}
+                        className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-lg transition-colors shadow-sm hover:shadow-md"
+                      >
+                        Cancel
+                      </button>
                     </div>
                   ) : (
                     <div className="flex gap-2">

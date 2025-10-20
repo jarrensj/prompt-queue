@@ -1,8 +1,16 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Warm cream/off-white background */
+  --background: #FAF7F0;
+  /* Charcoal gray for text */
+  --foreground: #4A4A4A;
+  /* Soft accent colors */
+  --accent-green: #8B9A7C;
+  --accent-brown: #A67C52;
+  --accent-light-green: #B8C9A8;
+  --soft-gray: #6B6B6B;
+  --lighter-cream: #FFFBF5;
 }
 
 @theme inline {
@@ -12,15 +20,48 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Segoe Print', 'Comic Sans MS', 'Bradley Hand', cursive, sans-serif;
+  line-height: 1.7;
+}
+
+/* Hand-drawn sketch effect for borders */
+.sketch-border {
+  position: relative;
+  border: 2px solid var(--foreground);
+  border-radius: 8px;
+  box-shadow: 2px 2px 0px rgba(74, 74, 74, 0.1);
+}
+
+.sketch-border::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border: 1px solid var(--foreground);
+  border-radius: 8px;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* Soft button styles */
+.sketch-button {
+  border: 2px solid currentColor;
+  border-radius: 6px;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.sketch-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 2px 3px 0px currentColor;
+}
+
+.sketch-button:active {
+  transform: translateY(0px);
+  box-shadow: 1px 1px 0px currentColor;
 }

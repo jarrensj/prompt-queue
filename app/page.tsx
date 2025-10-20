@@ -108,28 +108,39 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 py-8 px-4">
-      <div className="max-w-2xl mx-auto">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8">
-          <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-2 text-center">
+    <div className="min-h-screen py-12 px-6" style={{ background: '#FAF7F0' }}>
+      <div className="max-w-3xl mx-auto">
+        <div className="sketch-border p-10 mb-8" style={{ background: '#FFFBF5' }}>
+          <h1 className="text-5xl font-light mb-3 text-center" style={{ color: '#4A4A4A', letterSpacing: '0.02em' }}>
             Prompt Queue
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 text-center mb-8">
+          <p className="text-center mb-10 opacity-70" style={{ color: '#6B6B6B', fontSize: '0.95rem' }}>
             record your upcoming prompts
           </p>
 
-          <form onSubmit={addTodo} className="mb-8">
-            <div className="flex gap-2">
+          <form onSubmit={addTodo} className="mb-10">
+            <div className="flex gap-3">
               <input
                 type="text"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="Add a new prompt…"
-                className="flex-1 px-4 py-3 rounded-lg border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 transition-colors"
+                className="flex-1 px-5 py-3 rounded-lg border-2 focus:outline-none transition-all"
+                style={{ 
+                  borderColor: '#4A4A4A',
+                  background: '#FFFBF5',
+                  color: '#4A4A4A',
+                  boxShadow: '2px 2px 0px rgba(74, 74, 74, 0.1)'
+                }}
               />
               <button
                 type="submit"
-                className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition-colors shadow-md hover:shadow-lg"
+                className="sketch-button px-7 py-3 font-medium"
+                style={{ 
+                  background: '#8B9A7C',
+                  color: '#FFFBF5',
+                  borderColor: '#6B7C5D'
+                }}
               >
                 Add
               </button>
@@ -137,55 +148,77 @@ export default function Home() {
           </form>
 
           {todos.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-gray-500 dark:text-gray-400 text-lg">
+            <div className="text-center py-16">
+              <p className="text-lg opacity-60" style={{ color: '#6B6B6B' }}>
                 No prompts yet. Add one to get started!
               </p>
             </div>
           ) : (
-            <ul className="space-y-3">
+            <ul className="space-y-4">
               {todos.map((todo) => (
                 <li
                   key={todo.id}
-                  className={`flex items-center justify-between p-4 rounded-lg transition-all duration-300 ${
-                    todo.isCompleting
-                      ? 'bg-red-100 dark:bg-red-900/30 border-2 border-red-300 dark:border-red-700 scale-95'
+                  className={`flex items-center justify-between p-5 rounded-lg transition-all duration-300 border-2`}
+                  style={{
+                    background: todo.isCompleting
+                      ? '#F5E6E6'
                       : newlyAddedId === todo.id
-                      ? 'bg-yellow-100 dark:bg-yellow-900/30 border-2 border-yellow-400 dark:border-yellow-600 shadow-lg'
-                      : 'bg-gray-50 dark:bg-gray-700 border-2 border-transparent hover:border-indigo-300 dark:hover:border-indigo-600'
-                  }`}
+                      ? '#F5F0E6'
+                      : '#FAF7F0',
+                    borderColor: todo.isCompleting
+                      ? '#D4A5A5'
+                      : newlyAddedId === todo.id
+                      ? '#C9BC9A'
+                      : '#4A4A4A',
+                    opacity: todo.isCompleting ? 0.7 : 1,
+                    boxShadow: newlyAddedId === todo.id ? '3px 3px 0px rgba(74, 74, 74, 0.15)' : '2px 2px 0px rgba(74, 74, 74, 0.1)'
+                  }}
                 >
-                  <span className={`flex-1 text-lg ${
-                    todo.isCompleting 
-                      ? 'line-through text-gray-500 dark:text-gray-400' 
-                      : 'text-gray-800 dark:text-white'
-                  }`}>
+                  <span 
+                    className={`flex-1 text-lg pr-4 ${todo.isCompleting ? 'line-through' : ''}`}
+                    style={{ color: todo.isCompleting ? '#8B8B8B' : '#4A4A4A' }}
+                  >
                     {todo.text}
                   </span>
                   
                   {todo.isCompleting ? (
-                    <div className="flex items-center gap-2">
-                      <span className="text-red-600 dark:text-red-400 font-semibold text-base animate-pulse">
+                    <div className="flex items-center gap-3">
+                      <span className="font-medium text-base animate-pulse" style={{ color: '#A67C52' }}>
                         Deleting in {todo.countdown}…
                       </span>
                       <button
                         onClick={() => cancelDelete(todo.id)}
-                        className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-lg transition-colors shadow-sm hover:shadow-md"
+                        className="sketch-button px-4 py-2 font-medium"
+                        style={{ 
+                          background: '#6B6B6B',
+                          color: '#FFFBF5',
+                          borderColor: '#4A4A4A'
+                        }}
                       >
                         Cancel
                       </button>
                     </div>
                   ) : (
-                    <div className="flex gap-2">
+                    <div className="flex gap-3">
                       <button
                         onClick={() => copyToClipboard(todo.text, todo.id)}
-                        className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors shadow-sm hover:shadow-md"
+                        className="sketch-button px-5 py-2 font-medium"
+                        style={{ 
+                          background: copiedId === todo.id ? '#B8C9A8' : '#FFFBF5',
+                          color: copiedId === todo.id ? '#FFFBF5' : '#8B9A7C',
+                          borderColor: '#8B9A7C'
+                        }}
                       >
                         {copiedId === todo.id ? 'Copied!' : 'Copy'}
                       </button>
                       <button
                         onClick={() => markAsComplete(todo.id)}
-                        className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg transition-colors shadow-sm hover:shadow-md"
+                        className="sketch-button px-5 py-2 font-medium"
+                        style={{ 
+                          background: '#8B9A7C',
+                          color: '#FFFBF5',
+                          borderColor: '#6B7C5D'
+                        }}
                       >
                         Complete
                       </button>
@@ -196,7 +229,7 @@ export default function Home() {
             </ul>
           )}
 
-          <div className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
+          <div className="mt-8 text-center text-sm opacity-60" style={{ color: '#6B6B6B' }}>
             {todos.length} {todos.length === 1 ? 'prompt' : 'prompts'}
           </div>
         </div>

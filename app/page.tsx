@@ -115,7 +115,7 @@ export default function Home() {
             Prompt Queue
           </h1>
           <p className="text-gray-500 dark:text-gray-400 text-center mb-8">
-            Add your prompts and watch them disappear
+            your prompt queue
           </p>
 
           <form onSubmit={addTodo} className="mb-8">

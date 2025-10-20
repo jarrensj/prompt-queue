@@ -14,6 +14,7 @@ export default function Home() {
   const [inputValue, setInputValue] = useState('');
   const [mounted, setMounted] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [newlyAddedId, setNewlyAddedId] = useState<string | null>(null);
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -47,6 +48,10 @@ export default function Home() {
       };
       setTodos([...todos, newTodo]);
       setInputValue('');
+      
+      // Highlight the newly added item
+      setNewlyAddedId(newTodo.id);
+      setTimeout(() => setNewlyAddedId(null), 3000);
     }
   };
 
@@ -127,6 +132,8 @@ export default function Home() {
                   className={`flex items-center justify-between p-4 rounded-lg transition-all duration-300 ${
                     todo.isCompleting
                       ? 'bg-red-100 dark:bg-red-900/30 border-2 border-red-300 dark:border-red-700 scale-95'
+                      : newlyAddedId === todo.id
+                      ? 'bg-yellow-100 dark:bg-yellow-900/30 border-2 border-yellow-400 dark:border-yellow-600 shadow-lg'
                       : 'bg-gray-50 dark:bg-gray-700 border-2 border-transparent hover:border-indigo-300 dark:hover:border-indigo-600'
                   }`}
                 >

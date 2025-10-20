@@ -90,7 +90,7 @@ export default function Home() {
                 type="text"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                placeholder="Add a new task..."
+                placeholder="Add a new task…"
                 className="flex-1 px-4 py-3 rounded-lg border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 transition-colors"
               />
               <button
@@ -130,7 +130,7 @@ export default function Home() {
                   {todo.isCompleting ? (
                     <div className="flex items-center gap-2">
                       <span className="text-red-600 dark:text-red-400 font-bold text-xl animate-pulse">
-                        Deleting in {todo.countdown}...
+                        Deleting in {todo.countdown}…
                       </span>
                     </div>
                   ) : (

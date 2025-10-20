@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "prompt queue",
-  description: "prompt queue",
+  description: "record your upcoming prompts",
 };
 
 export default function RootLayout({

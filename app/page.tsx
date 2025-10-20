@@ -15,6 +15,8 @@ export default function Home() {
   const [mounted, setMounted] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [newlyAddedId, setNewlyAddedId] = useState<string | null>(null);
+  const [showSettings, setShowSettings] = useState(false);
+  const [animatedDelete, setAnimatedDelete] = useState(true);
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -28,6 +30,17 @@ export default function Home() {
         console.error('Error loading todos:', e);
       }
     }
+    
+    // Load settings
+    const settings = localStorage.getItem('settings');
+    if (settings) {
+      try {
+        const parsed = JSON.parse(settings);
+        setAnimatedDelete(parsed.animatedDelete ?? true);
+      } catch (e) {
+        console.error('Error loading settings:', e);
+      }
+    }
   }, []);
 
   // Save to localStorage whenever todos change
@@ -37,6 +50,13 @@ export default function Home() {
       localStorage.setItem('todos', JSON.stringify(todosToSave));
     }
   }, [todos, mounted]);
+
+  // Save settings to localStorage
+  useEffect(() => {
+    if (mounted) {
+      localStorage.setItem('settings', JSON.stringify({ animatedDelete }));
+    }
+  }, [animatedDelete, mounted]);
 
   const addTodo = (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,6 +86,13 @@ export default function Home() {
   };
 
   const markAsComplete = (id: string) => {
+    if (!animatedDelete) {
+      // Instant delete
+      setTodos(prev => prev.filter(todo => todo.id !== id));
+      return;
+    }
+
+    // Animated delete with countdown
     setTodos(todos.map(todo => 
       todo.id === id ? { ...todo, isCompleting: true, countdown: 3 } : todo
     ));
@@ -92,7 +119,45 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 py-8 px-4">
       <div className="max-w-2xl mx-auto">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 relative">
+          {/* Settings Button */}
+          <button
+            onClick={() => setShowSettings(!showSettings)}
+            className="absolute top-6 right-6 p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+            aria-label="Settings"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </button>
+
+          {/* Settings Modal */}
+          {showSettings && (
+            <div className="absolute top-16 right-6 bg-white dark:bg-gray-700 rounded-lg shadow-xl border-2 border-gray-200 dark:border-gray-600 p-4 z-10 min-w-[280px]">
+              <h3 className="font-semibold text-gray-800 dark:text-white mb-3 text-lg">Settings</h3>
+              <div className="space-y-3">
+                <label className="flex items-center justify-between cursor-pointer">
+                  <span className="text-gray-700 dark:text-gray-300">Delete Animation</span>
+                  <div className="relative">
+                    <input
+                      type="checkbox"
+                      checked={animatedDelete}
+                      onChange={(e) => setAnimatedDelete(e.target.checked)}
+                      className="sr-only"
+                    />
+                    <div className={`w-11 h-6 rounded-full transition-colors ${animatedDelete ? 'bg-indigo-600' : 'bg-gray-300 dark:bg-gray-600'}`}>
+                      <div className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${animatedDelete ? 'translate-x-5' : 'translate-x-0'}`}></div>
+                    </div>
+                  </div>
+                </label>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {animatedDelete ? 'Shows 3-2-1 countdown before deletion' : 'Deletes instantly when marked complete'}
+                </p>
+              </div>
+            </div>
+          )}
+
           <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-2 text-center">
             Prompt Queue
           </h1>

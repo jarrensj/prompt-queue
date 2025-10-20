@@ -13,6 +13,7 @@ export default function Home() {
   const [todos, setTodos] = useState<TodoItem[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [mounted, setMounted] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -46,6 +47,16 @@ export default function Home() {
       };
       setTodos([...todos, newTodo]);
       setInputValue('');
+    }
+  };
+
+  const copyToClipboard = async (text: string, id: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
     }
   };
 
@@ -134,12 +145,20 @@ export default function Home() {
                       </span>
                     </div>
                   ) : (
-                    <button
-                      onClick={() => markAsComplete(todo.id)}
-                      className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg transition-colors shadow-sm hover:shadow-md"
-                    >
-                      Complete
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => copyToClipboard(todo.text, todo.id)}
+                        className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors shadow-sm hover:shadow-md"
+                      >
+                        {copiedId === todo.id ? 'Copied!' : 'Copy'}
+                      </button>
+                      <button
+                        onClick={() => markAsComplete(todo.id)}
+                        className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg transition-colors shadow-sm hover:shadow-md"
+                      >
+                        Complete
+                      </button>
+                    </div>
                   )}
                 </li>
               ))}

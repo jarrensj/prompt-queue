@@ -92,7 +92,7 @@ export default function Home() {
             Prompt Queue
           </h1>
           <p className="text-gray-500 dark:text-gray-400 text-center mb-8">
-            Add your tasks and watch them disappear
+            Add your prompts and watch them disappear
           </p>
 
           <form onSubmit={addTodo} className="mb-8">
@@ -101,7 +101,7 @@ export default function Home() {
                 type="text"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                placeholder="Add a new task…"
+                placeholder="Add a new prompt…"
                 className="flex-1 px-4 py-3 rounded-lg border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 transition-colors"
               />
               <button
@@ -116,7 +116,7 @@ export default function Home() {
           {todos.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-gray-500 dark:text-gray-400 text-lg">
-                No tasks yet. Add one to get started!
+                No prompts yet. Add one to get started!
               </p>
             </div>
           ) : (
@@ -166,7 +166,7 @@ export default function Home() {
           )}
 
           <div className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
-            {todos.length} {todos.length === 1 ? 'task' : 'tasks'}
+            {todos.length} {todos.length === 1 ? 'prompt' : 'prompts'}
           </div>
         </div>
       </div>

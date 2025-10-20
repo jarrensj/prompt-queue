@@ -1,5 +1,156 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+
+interface TodoItem {
+  id: string;
+  text: string;
+  isCompleting: boolean;
+  countdown?: number;
+}
+
 export default function Home() {
+  const [todos, setTodos] = useState<TodoItem[]>([]);
+  const [inputValue, setInputValue] = useState('');
+  const [mounted, setMounted] = useState(false);
+
+  // Load from localStorage on mount
+  useEffect(() => {
+    setMounted(true);
+    const stored = localStorage.getItem('todos');
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        setTodos(parsed.map((item: TodoItem) => ({ ...item, isCompleting: false, countdown: undefined })));
+      } catch (e) {
+        console.error('Error loading todos:', e);
+      }
+    }
+  }, []);
+
+  // Save to localStorage whenever todos change
+  useEffect(() => {
+    if (mounted) {
+      const todosToSave = todos.filter(todo => !todo.isCompleting);
+      localStorage.setItem('todos', JSON.stringify(todosToSave));
+    }
+  }, [todos, mounted]);
+
+  const addTodo = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (inputValue.trim()) {
+      const newTodo: TodoItem = {
+        id: Date.now().toString(),
+        text: inputValue.trim(),
+        isCompleting: false,
+      };
+      setTodos([...todos, newTodo]);
+      setInputValue('');
+    }
+  };
+
+  const markAsComplete = (id: string) => {
+    setTodos(todos.map(todo => 
+      todo.id === id ? { ...todo, isCompleting: true, countdown: 3 } : todo
+    ));
+
+    // Countdown timer
+    let count = 3;
+    const interval = setInterval(() => {
+      count--;
+      if (count === 0) {
+        clearInterval(interval);
+        setTodos(prev => prev.filter(todo => todo.id !== id));
+      } else {
+        setTodos(prev => prev.map(todo => 
+          todo.id === id ? { ...todo, countdown: count } : todo
+        ));
+      }
+    }, 1000);
+  };
+
+  if (!mounted) {
+    return null; // Prevent hydration mismatch
+  }
+
   return (
-    <h1>prompt queue</h1>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 py-8 px-4">
+      <div className="max-w-2xl mx-auto">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8">
+          <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-2 text-center">
+            Prompt Queue
+          </h1>
+          <p className="text-gray-500 dark:text-gray-400 text-center mb-8">
+            Add your tasks and watch them disappear
+          </p>
+
+          <form onSubmit={addTodo} className="mb-8">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                placeholder="Add a new task..."
+                className="flex-1 px-4 py-3 rounded-lg border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 transition-colors"
+              />
+              <button
+                type="submit"
+                className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition-colors shadow-md hover:shadow-lg"
+              >
+                Add
+              </button>
+            </div>
+          </form>
+
+          {todos.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-500 dark:text-gray-400 text-lg">
+                No tasks yet. Add one to get started!
+              </p>
+            </div>
+          ) : (
+            <ul className="space-y-3">
+              {todos.map((todo) => (
+                <li
+                  key={todo.id}
+                  className={`flex items-center justify-between p-4 rounded-lg transition-all duration-300 ${
+                    todo.isCompleting
+                      ? 'bg-red-100 dark:bg-red-900/30 border-2 border-red-300 dark:border-red-700 scale-95'
+                      : 'bg-gray-50 dark:bg-gray-700 border-2 border-transparent hover:border-indigo-300 dark:hover:border-indigo-600'
+                  }`}
+                >
+                  <span className={`flex-1 text-lg ${
+                    todo.isCompleting 
+                      ? 'line-through text-gray-500 dark:text-gray-400' 
+                      : 'text-gray-800 dark:text-white'
+                  }`}>
+                    {todo.text}
+                  </span>
+                  
+                  {todo.isCompleting ? (
+                    <div className="flex items-center gap-2">
+                      <span className="text-red-600 dark:text-red-400 font-bold text-xl animate-pulse">
+                        Deleting in {todo.countdown}...
+                      </span>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => markAsComplete(todo.id)}
+                      className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg transition-colors shadow-sm hover:shadow-md"
+                    >
+                      Complete
+                    </button>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <div className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
+            {todos.length} {todos.length === 1 ? 'task' : 'tasks'}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

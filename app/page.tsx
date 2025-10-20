@@ -67,11 +67,11 @@ export default function Home() {
 
   const markAsComplete = (id: string) => {
     setTodos(todos.map(todo => 
-      todo.id === id ? { ...todo, isCompleting: true, countdown: 3 } : todo
+      todo.id === id ? { ...todo, isCompleting: true, countdown: 2 } : todo
     ));
 
     // Countdown timer
-    let count = 3;
+    let count = 2;
     const interval = setInterval(() => {
       count--;
       if (count === 0) {
@@ -147,7 +147,7 @@ export default function Home() {
                   
                   {todo.isCompleting ? (
                     <div className="flex items-center gap-2">
-                      <span className="text-red-600 dark:text-red-400 font-bold text-xl animate-pulse">
+                      <span className="text-red-600 dark:text-red-400 font-bold text-base animate-pulse">
                         Deleting in {todo.countdown}…
                       </span>
                     </div>

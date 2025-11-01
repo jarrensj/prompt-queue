@@ -15,11 +15,24 @@ export default function Home() {
   const [mounted, setMounted] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [newlyAddedId, setNewlyAddedId] = useState<string | null>(null);
+  const [lastVisit, setLastVisit] = useState<string | null>(null);
   const intervalsRef = useRef<Record<string, NodeJS.Timeout>>({});
 
-  // Load from localStorage on mount
+  // Load from localStorage on mount and track last visit
   useEffect(() => {
     setMounted(true);
+    
+    // Get last visit time
+    const lastVisitTime = localStorage.getItem('lastVisit');
+    if (lastVisitTime) {
+      setLastVisit(lastVisitTime);
+    }
+    
+    // Store current visit time
+    const currentVisit = new Date().toISOString();
+    localStorage.setItem('lastVisit', currentVisit);
+    
+    // Load todos
     const stored = localStorage.getItem('todos');
     if (stored) {
       try {
@@ -103,6 +116,20 @@ export default function Home() {
     ));
   };
 
+  const formatLastVisit = (isoString: string) => {
+    const date = new Date(isoString);
+    return date.toLocaleString('en-US', {
+      weekday: 'short',
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    });
+  };
+
   if (!mounted) {
     return null; // Prevent hydration mismatch
   }
@@ -114,9 +141,17 @@ export default function Home() {
           <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-2 text-center">
             Prompt Queue
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 text-center mb-8">
+          <p className="text-gray-500 dark:text-gray-400 text-center mb-4">
             record your upcoming prompts
           </p>
+
+          {lastVisit && (
+            <div className="mb-6 p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800">
+              <p className="text-sm text-center text-indigo-800 dark:text-indigo-300">
+                <span className="font-semibold">Last visit:</span> {formatLastVisit(lastVisit)}
+              </p>
+            </div>
+          )}
 
           <form onSubmit={addTodo} className="mb-8">
             <div className="flex gap-2">
